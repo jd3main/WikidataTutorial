@@ -4,16 +4,14 @@ Wikidata 入門筆記 2 - Query with SPARQL
 ###### tags: `Wikidata`
 
 :::warning
-此筆記持續編修中
+(2018/11/28)
+這是複製出來提供預覽的版本，裡面有些已知的問題尚未修改
 :::
 
-:::warning
-TODO：
-* p,ps 的意涵需要再確認
-* 單位轉換待研究
-* Data Type 的概念需補充
-:::
-
+* [目錄](https://hackmd.io/4zBqrwb9SEGDf7e_jUXa-g)
+* [Wikidata 入門筆記 1 -  基本介紹](https://hackmd.io/beKtq8AURSq0a1jpk-ktXw)
+* **Wikidata 入門筆記 2 -  Query with SPARQL**
+* [Wikidata 入門筆記 3 -  API與工具](https://hackmd.io/zQNmxYZiS5-F_1w4nKD_BQ)
 
 ### 連結
 * [User Manual](https://www.mediawiki.org/wiki/Wikidata_Query_Service/User_Manual)

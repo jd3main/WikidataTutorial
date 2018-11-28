@@ -4,16 +4,13 @@ Wikidata 入門筆記 3 - API與工具
 ###### tags: `Wikidata`
 
 :::warning
-此筆記將進行大幅度翻修
+(2018/11/28) 這是複製出來提供預覽的版本
 :::
 
-:::warning
-TODO：
-* Login API
-* Other importaint APIs
-* Wikidata SDK (might be annother document)
-:::
-
+* [目錄](https://hackmd.io/4zBqrwb9SEGDf7e_jUXa-g)
+* [Wikidata 入門筆記 1 -  基本介紹](https://hackmd.io/beKtq8AURSq0a1jpk-ktXw)
+* [Wikidata 入門筆記 2 -  Query with SPARQL](https://hackmd.io/FvtDFlNYSbSMEOEvJGr0yA)
+* **Wikidata 入門筆記 3 -  API與工具**
 
 ## 工具
 * [Wikidata:Tools](https://www.wikidata.org/wiki/Wikidata:Tools)  // 這裡有很多工具可以玩
@@ -52,7 +49,10 @@ Wikidata 仰賴 Wikibase（一個 MediaWiki 的 extension）
 
 > 以下我是在 WSL Ubuntu 16.04 上實驗
 
-> You can also use your browser to try it
+### 不想用 terminal？
+你也可以用瀏覽器直接 GET
+以下的範例只要把 Host 和 Path 接起來，貼到瀏覽器的網址列就行了
+不過這樣你可能沒辦法指定 Accept 的格式
 
 ### SPARQL Query (1) - 透過 Query Service
 Query 的時候你有兩種選擇

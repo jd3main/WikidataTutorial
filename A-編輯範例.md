@@ -3,10 +3,13 @@ Wikidata 入門筆記 A - 編輯範例
 
 ###### tags: `Wikidata`
 
-## Item 來源
->透過了解來源可以進一步了解編寫邏輯
+:::warning
+(2018/11/28) 這是複製出來提供預覽的版本
+:::
 
 目前 Item 主要有幾種來源
+>透過了解來源可以進一步了解編寫邏輯
+
 * 各式維基計畫條目自動生成
     * 幾乎所有的維基計畫條目生成後就會自動生成對應的維基數據頁
      ![](https://upload.wikimedia.org/wikipedia/commons/3/33/Wikidata%E6%95%99%E5%AD%B8%E7%AF%84%E4%BE%8B-3.png)
