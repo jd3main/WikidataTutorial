@@ -14,7 +14,6 @@ TODO：
 * Data Type 的概念需補充
 :::
 
-* [目錄](https://github.com/jd3main/WikidataTutorial/0-目錄.md)
 
 ### 連結
 * [User Manual](https://www.mediawiki.org/wiki/Wikidata_Query_Service/User_Manual)

@@ -3,8 +3,6 @@ Wikidata 入門筆記 A - 編輯範例
 
 ###### tags: `Wikidata`
 
-* [目錄](https://github.com/jd3main/WikidataTutorial/0-目錄.md)
-
 ## Item 來源
 >透過了解來源可以進一步了解編寫邏輯
 

@@ -15,8 +15,6 @@ TODO：
 :::
 
 
-* [目錄](https://github.com/jd3main/WikidataTutorial/0-目錄.md)
-
 ## 工具
 * [Wikidata:Tools](https://www.wikidata.org/wiki/Wikidata:Tools)  // 這裡有很多工具可以玩
 
