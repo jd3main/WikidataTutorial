@@ -3,23 +3,96 @@ Wikidata 入門筆記 3 - API與工具
 
 ###### tags: `Wikidata`
 
-:::warning
-(2018/11/28) 這是複製出來提供預覽的版本
-:::
+{%hackmd pPCm34WnTpyby2g957L4Gg %}
 
-* [目錄](https://hackmd.io/4zBqrwb9SEGDf7e_jUXa-g)
-* [Wikidata 入門筆記 1 -  基本介紹](https://hackmd.io/beKtq8AURSq0a1jpk-ktXw)
-* [Wikidata 入門筆記 2 -  Query with SPARQL](https://hackmd.io/FvtDFlNYSbSMEOEvJGr0yA)
-* **Wikidata 入門筆記 3 -  API與工具**
+## 關於工具
+[Wikidata:Tools](https://www.wikidata.org/wiki/Wikidata:Tools) 有很多工具可以玩，不過大多年久失修
 
-## 工具
-* [Wikidata:Tools](https://www.wikidata.org/wiki/Wikidata:Tools)  // 這裡有很多工具可以玩
+開發者可以在 GitHub 找到一些不錯的套件，例如 [這個CLI工具](https://github.com/maxlath/wikibase-cli)
 
+我們也正在開發 [Golang 寫成的 client](https://github.com/jd3main/gowd) 以及能將 SPARQL Query 圖像化的網頁服務，如果你有興趣參與，歡迎聯絡 [Wikidata Taiwan](https://www.facebook.com/WikidataTW/?ref=br_rs) 社群
 
-## API 概觀
-### 端口
-MediaWiki 提供了海量的 api
-所有 WIkimedia 的網站都以 `/w/api.php` 做為 API 端口
+## 先備知識
+因為 API 偏向開發者需要知道的
+所以以下假設你知道：
+* API 是什麼意思
+* HTTP GET 和 POST 是什麼
+* 如何在網址列傳 GET 參數
+
+了解以下的東西可能有助於理解接下來介紹的 API，但非必要
+* Wikibase Data Model [^[1]^](https://www.mediawiki.org/wiki/Wikibase/DataModel/Primer)[^[2]^](https://www.mediawiki.org/w/index.php?title=Wikibase/DataModel)
+* Wikibase Data Type [^[1]^](https://www.wikidata.org/wiki/Help:Data_type)
+
+## 概觀
+參考連結：[Wikidata:Data access](https://www.wikidata.org/wiki/Wikidata:Data_access)
+####
+以下我們將介紹四種方法
+* Special:EntityData
+* Wikibase API
+* SPARQL query
+* 完整 dump
+
+#### Special:EntityData
+透過 special page 提供的介面取得格式化的資料
+例如 [李梅樹(Q700797)](https://www.wikidata.org/wiki/Q700797) 的 [json檔](https://www.wikidata.org/wiki/Special:EntityData/Q700797.json)
+
+#### Wikibase API
+Wikibase 是支撐 wikidata 的套件
+他提供了許多 API 來存取資料
+
+#### SPARQL query
+Query service 除了前面提過的 GUI 介面以外
+也提供了 API 端口
+
+#### 完整 dump
+將整個 wikidata 資料庫載下來
+
+## Linked Data interface
+你可以透過特定 URL 直接下載各種格式的資料
+wikidata 提供了這個 [namespace](https://www.wikidata.org/wiki/Help:Namespaces) 作為端口：
+
+$\quad$ https://www.wikidata.org/wiki/Special:EntityData
+
+> [完整說明](https://www.mediawiki.org/wiki/Wikibase/EntityData)
+
+#### HTTP GET
+GET 參數：
+|            | 範例  | 內容                              |
+|------------|------|-----------------------------------|
+| **id**     | Q2   | P,Q,L ... 等為開頭的編號            |
+| **format** | json | html, json, rdf, nt, ttl, n3, php |
+| **revision** |  | oldid |
+
+例如 地球(Q2) 的 json 檔：
+* https://www.wikidata.org/wiki/Special:EntityData?id=Q2&format=json
+
+instance of (P31) 的 turtle 檔：
+* https://www.wikidata.org/wiki/Special:EntityData?id=P31&format=ttl
+
+revision 是指定版本號用的
+你可以在左側的「永久連結(Permanent Link)」或是編輯紀錄裡找到指定版本的永久連結
+並在網址列找到 oldid 的值
+
+例如 學生計算機年會(Q19851407) 最早版本的永久連結是
+$\qquad$ https://www.wikidata.org/w/index.php?title=Q19851407&oldid=214218139
+其中 oldid 為 214218139
+使用起來大概長這樣：
+* https://www.wikidata.org/wiki/Special:EntityData?id=Q19851407&format=ttl&oldid=214218139
+
+#### 再簡單一點
+Q 或 L 開頭的 entity 有更簡短的作法
+只要加上`/id.format` 就行了
+以 [李梅樹(Q700797)](https://www.wikidata.org/wiki/Q700797) 為例：
+$\qquad$ https://www.wikidata.org/wiki/Special:EntityData/Q70797.json
+
+或是用：https://www.wikidata.org/entity/Q70797.json
+它會重新導向到 Special:EntityData 那個連結
+
+## Wikibase API
+
+### MediaWiki API
+MediaWiki 提供了海量的 API
+所有 Wikimedia 的網站都以 `/w/api.php` 做為 API 端口
 
 例如：
 | 網站     | API 端口 |
@@ -31,17 +104,31 @@ MediaWiki 提供了海量的 api
 如果沒有傳送任何參數（例如直接用上面的 URL）
 會看到 help 頁面
 
-### 
+### Wikibase
 Wikidata 仰賴 Wikibase（一個 MediaWiki 的 extension）
 比對一下 Wikipedia 和 Wikidata 的 api 頁面
 可以發現 Wikidata 的頁面多出了一些以 `wb` 為前綴的 api
 這些就是 **W**iki**b**ase 的 api
 
-> 想查閱中文說明可以看中文維基的 api 頁面
-> 但是 wb 因為只有 wikidata 有全部啟用，
-> 而 wikidata 只有英文的說明文件所以沒辦法
+> 如果想看中文說明文件
+> 在 wikidata 裡調整為中文介面後再瀏覽 api 說明文件就會看到
 
-## 實作
+### API 使用範例
+以下以兩個實用 API 作為範例
+
+#### wbgetentities
+這個 API 能取得一個或多個 entity 的資料
+
+* 取得 Q42 的資料：
+$\qquad$ [api.php?action=wbgetentities&ids=Q42](https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q42)
+* 取得 Q42 和 P17 的資料：
+$\qquad$ [api.php?action=wbgetentities&ids=Q42|P17](https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q42)
+* 取得 Q42 和 P17 的資料（json格式）：
+$\qquad$ [api.php?action=wbgetentities&ids=Q42|P17&format=json](https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q42|P17&format=json)
+#### wbsearchentities
+這個 API 能用文字搜尋 entity
+
+## 實作 - query
 ### 工具安裝 - openssl
 
 以 debian/ubuntu 為例
@@ -188,9 +275,7 @@ http://www.wikidata.org/entity/Q851190,Mrs. Chippy
 http://www.wikidata.org/entity/Q1050083,Catmando
 ```
 
-### SPARQL Query (2) - 透過 api.php
-
-// TODO
+## 實作 - Search Entities
 
 ### Search Entities
 例如想用關鍵字搜尋項目
@@ -212,42 +297,5 @@ Host: www.wikidata.org
 ![](https://i.imgur.com/0bUxHSb.png)
 
 
-### 
-
-<style>
-.part{
-    margin-left: 26px;
-}
-h1.part{
-    text-align:center;
-}
-h2.part{
-    margin-left: 0px;
-    border: solid;
-    border-left: none;
-    border-right: none;
-    border-top: 3px #900 solid;
-    border-bottom: 1px #396 solid;
-    color: black;
-    text-align:center;
-    background-color: #F6F6F6;
-    padding: 6px;
-}
-h3.part{
-    margin-left: 0px;
-    border-top: solid 1.5px #069;
-    border-bottom: solid 1px #396;
-    padding: 5px 5px;
-}
-h4.part{
-    margin-left: 15px;
-    border: dotted #396;
-    border-width: 1px 0px 0px 0px;
-}
-h5.part{
-    margin-left: 20px;
-}
-h6.part{
-    margin-left: 23px;
-}
-</style>
+## 完整 dump
+[Wikidata:Database download](https://www.wikidata.org/wiki/Wikidata:Database_download)
