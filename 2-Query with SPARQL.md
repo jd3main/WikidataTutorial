@@ -3,22 +3,23 @@ Wikidata 入門筆記 2 - Query with SPARQL
 
 ###### tags: `Wikidata`
 
-:::warning
-(2018/11/28)
-這是複製出來提供預覽的版本，裡面有些已知的問題尚未修改
-:::
+{%hackmd pPCm34WnTpyby2g957L4Gg %}
 
-* [目錄](https://hackmd.io/4zBqrwb9SEGDf7e_jUXa-g)
-* [Wikidata 入門筆記 1 -  基本介紹](https://hackmd.io/beKtq8AURSq0a1jpk-ktXw)
-* **Wikidata 入門筆記 2 -  Query with SPARQL**
-* [Wikidata 入門筆記 3 -  API與工具](https://hackmd.io/zQNmxYZiS5-F_1w4nKD_BQ)
 
-### 連結
-* [User Manual](https://www.mediawiki.org/wiki/Wikidata_Query_Service/User_Manual)
+## 前言
+
+在這個單元裡，將會介紹一些 SPARQL 的語法
+
+雖然內容很長，但你不需要一口氣讀完
+就算只讀懂第一個範例，也可以玩很多有趣的 query 了
+可以之後再根據需求回來找找有沒有好用的語法
+
+### 參考連結
 * [Building_a_query](https://www.wikidata.org/wiki/Wikidata:SPARQL_query_service/Building_a_query) (這邊有一些不錯的 step-by-step 教學)
 * [SPARQL tutorial](https://www.wikidata.org/wiki/Wikidata:SPARQL_tutorial)
-* [Search Property](https://www.wikidata.org/wiki/Wikidata:List_of_properties)
+* [List of properties](https://www.wikidata.org/wiki/Wikidata:List_of_properties)
 
+## 基本語法
 ### Example : House Cat with Picture
 這是內建範例的其中一個拿來改的
 用來查詢所有有圖片的家貓(Q146)
@@ -64,7 +65,7 @@ WHERE
 ```javascript=
 wd:Q30  wdt:P36  wd:Q61 .
 ```
-Wikidata 提供了這一大堆前綴
+Wikidata 提供了一大堆前綴
 
 | Prefix | URL                                          |
 |--------|----------------------------------------------|
@@ -79,8 +80,10 @@ Wikidata 提供了這一大堆前綴
 | rdfs:  | \<http://www.w3.org/2000/01/rdf-schema#>     |
 | bd:    | \<http://www.bigdata.com/rdf#>               |
 
+> 完整的 [prefix list](https://en.wikibooks.org/wiki/SPARQL/Prefixes)
+
 每個前綴有不同的意義
-最常用的就是標示 項目的 wd 和標示屬性的 wdt
+最常用的就是標示項目的 wd 和標示屬性的 wdt
 用法就像前面的範例 code 一樣
 
 ### 條件的運作方式
@@ -115,7 +118,12 @@ zh 開頭的就有這些
 | zh-min-nan    | 閩南語
 | zh-yue        | 粵語
 
-通常我會直接編輯 zh-hant 和 zh-tw
+通常我會優先使用 zh-hant 和 zh-tw
+
+#### 多個語言
+你可以指定多個語言，並依照給定的優先順序來使用
+例如： `zh-tw, zh-hant, en`
+這表示使用 中文(台灣)
 
 ### Limit
 在 `WHERE{ ... }` 後面 加上 `limit <number>` 就可以限制查詢的數量
@@ -152,8 +160,8 @@ WHERE
 我們需要能透過判斷 qualifier 來篩選需要的東西
 這時候就會用到 p,ps,pq
 p = **p**roperty
-ps = **p**roperty **s**tatement
-pq = **p**roperty **q**ualifier
+ps = **p**roperty / **s**tatement
+pq = **p**roperty / **q**ualifier
 
 > 這裡有一篇[教學](https://www.wikidata.org/wiki/Wikidata:SPARQL_tutorial#Qualifiers) ，裡面的套色比教精美
 
@@ -165,21 +173,21 @@ wd:Q12418 p:P186 ?statement1.       # Mona Lisa: material used: ?statement1
 ```
 第 1 行用 `p:` 取代 `wdt:` 
 這時取出來的變數 `?statement1` 就不會是單一個 value
-而是一整個 "statement"
-你可以想像成他是一個裝著 value 和一些 qualifier,references 的結構
-下圖中的三個區塊就可以想成是三個 statement
-![](https://i.imgur.com/K429Cwy.png)
+而是一個稱為 ***claim*** 或是 *statement node* 的結構
+一個 claim 由一個 property、一個 value、和一些 qualifier 組成
+(但不含references)
+> 如果你很想知道這是什麼結構請參考 [DataModel](https://www.mediawiki.org/wiki/Wikibase/DataModel/Primer)
 
 
 第 2 行：「`?statement1` 的 value 就是 Q291034」
 用 `ps:` 來取 value
 `ps:` 後面也只能和前面 `p:` 一樣放 P186 了，不然就一定沒東西符合條件
-因為經過第一行後 statement1 只有可能有 P186 的 statement 的內容
+因為經過第一行後 `?statement1` 只有可能有 P186 的 statement 的內容
 
 第 3 行：「`?statement1` 有個 qualifier P518 ，其值為 Q291034」
 用 `pq:` 來取 qualifier
 
-上面的 code 還不能 query 什麼
+上面的 code 只是示範語法，並不能 query 什麼
 以下是稍微改了一下之後的幾種用法
 
 * 查詢蒙娜麗莎的所有使用的材質 (這可以只用 wdt 做到)
@@ -211,52 +219,7 @@ WHERE
 limit 100    # Maybe lots of result exist, so add a limit
 ```
 
-#### 單位轉換
-在 Wikidata 裡單位也是一種 Qualifier
-長寬、半徑、重量之類的 property ，其 value 都只會存數值
-
-單位轉換有點麻煩
-我目前也還不是很懂，就暫時放個範例
-這段範例是從 [這篇文章](https://en.wikibooks.org/wiki/SPARQL/WIKIDATA_Precision,_Units_and_Coordinates) 出來的
-```javascript=
-# Longest rivers in the USA
-SELECT ?item ?itemLabel ?length ?unitLabel ?lowerbound ?upperbound ?precision ?length2 ?conversion ?length_in_m 
-WHERE
-{
-  ?item          wdt:P31/wdt:P279*           wd:Q4022.    # rivers
-  ?item          wdt:P17                     wd:Q30.      # country USA
-  ?item          p:P2043                     ?stmnode.    # length
-  ?stmnode       psv:P2043                   ?valuenode.
-  ?valuenode     wikibase:quantityAmount     ?length.
-  ?valuenode     wikibase:quantityUnit       ?unit.
-  ?valuenode     wikibase:quantityLowerBound ?lowerbound.
-  ?valuenode     wikibase:quantityUpperBound ?upperbound.
-  BIND((?upperbound-?lowerbound)/2 AS ?precision).
-  BIND(IF(?precision=0, ?length, (CONCAT(str(?length), "±", str(?precision)))) AS ?length2). 
-
-  # conversion to SI unit
-  ?unit          p:P2370                 ?unitstmnode.   # conversion to SI unit
-  ?unitstmnode   psv:P2370               ?unitvaluenode. 
-  ?unitvaluenode wikibase:quantityAmount ?conversion.
-  ?unitvaluenode wikibase:quantityUnit   wd:Q11573.      # meter
-  BIND(?length * ?conversion AS ?length_in_m).
-  
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-} 
-ORDER BY DESC(?length_in_m)
-LIMIT 10
-```
-
-##### BIND
-BIND 的基本格式： `BIND(expression AS ?variable)`
-可以把 expression 的值給 ?variable
-expression 中是可以進行 +,-,*,/ 運算的
-##### IF
-IF 的基本格式： `IF(condition,thenExpression,elseExpression)`
-
-
-
-### 更多語法
+## 更多語法
 SPARQL 還有很多語法可以幫助簡化敘述
 在排版得當的情況下也更容易閱讀其中的邏輯
 
@@ -350,8 +313,7 @@ Q1  P1 [
 ```javascript=
 ?item wdt:P31/wdt:P279* wd:Q735.
 ```
-可以找到所有藝術品
-也就是 art (Q735) 或其子類別的 instance
+可以找到所有 藝術品(Q735) 或其子類別的 instance
 
 > 通常 "is"，或是中文說「是...的一種」，會有幾種不同的意思
 > 在 wikidata 裡面主要分成 [subclass of](https://www.wikidata.org/wiki/Property:P279) 和 [instance of](https://www.wikidata.org/wiki/Property:P31)
@@ -375,8 +337,104 @@ WHERE
 只要其中一個是 [約翰·塞巴斯蒂安·巴赫](https://www.wikidata.org/wiki/Q1339)，那他就是巴赫的後代了
 `(wdt:P22|wdt:P25)+` 就是一個以上的 P22 和 P25 的隨意組合
 
-### 總結
-最後附上一個我實際用到的 Query 當作總結
+
+## DataModel & DataType
+:::warning
+施工中
+:::
+### Data Model
+#### 連結
+* [完整說明](https://www.mediawiki.org/w/index.php?title=Wikibase/DataModel)
+* [簡要說明](https://www.mediawiki.org/wiki/Wikibase/DataModel/Primer)
+
+### Data Type
+#### 連結
+* [說明文件](https://www.wikidata.org/wiki/Help:Data_type)
+#### 列表
+value 裡可以放各種不同類型的資料
+這些類型我們稱之為 data type
+目前有這些 data types
+| data type | 簡述         | 範例 |
+|-----------|-------------|---------|
+| Commons media | 共享資源中的檔案 |Wikidata-logo.svg |
+| Globe coordinate | 地球座標 | 23°46'N, 121°0'E |
+| Item | wikidata 項目 | Q2 |
+| Property | wikidata 屬性 | P31 |
+| String | 字串 | [Panthera len](https://www.wikidata.org/wiki/Q140#P225) |
+| Monolingual text | 多語言文字，即需要指定語言的字串 | [Roma (Italian)](https://www.wikidata.org/wiki/Q220#P1448) |
+| Quantity | 純量或含單位的量值 | [73.477±0.001 yottagram](https://www.wikidata.org/wiki/Q405#P2067)  |
+| Time | 時間 | [13 March 1902](https://www.wikidata.org/wiki/Q700797#P569) |
+| URL | 網址 | [https://www.intel.com/content/www/us/en/homepage.html](https://www.wikidata.org/wiki/Q248#P856) |
+| Mathematical expression | 數學式 | [O(n^2)](https://www.wikidata.org/wiki/Q486598#P3752) |
+| External identifier | 外部id | [DoctorKoWJ](https://www.wikidata.org/wiki/Q18113714#P2013) |
+| Geographic shape | 地理形狀 | [Data:Neighbourhoods/New York City.map](https://www.wikidata.org/wiki/Q11299#P3896) |
+| Tabular data | 表格資料 |  |
+| Lexemes | 語意屬性 |  |
+| Forms | 語意屬性 |  |
+| Senses | 語意屬性 |  |
+#### 
+以下介紹一些和 data type 有關連的東西
+
+### Quantity 和單位轉換
+在 Wikidata 裡單位轉換有點小麻煩
+####
+quantity 的組成大致長這樣：
+
+$\qquad$ `amount [lower_bound] [upper_bound] unit`
+
+amount 是主要的值
+
+lower_bound 和 upper_bound 是可選的下界和上界
+用來描述不確定範圍的值
+
+unit 是一個網址，指向一個記載單位的 item（[這裡的其中一個](https://www.wikidata.org/wiki/Wikidata:Units)）
+如果填入1，表示沒有單位（因次為1）
+
+#### 範例
+暫時放個範例和一些連結
+這段範例是從 [這篇文章](https://en.wikibooks.org/wiki/SPARQL/WIKIDATA_Precision,_Units_and_Coordinates) 出來的
+```javascript=
+# Longest rivers in the USA
+SELECT ?item ?itemLabel ?length ?unitLabel ?lowerbound ?upperbound ?precision ?length2 ?conversion ?length_in_m 
+WHERE
+{
+  ?item          wdt:P31/wdt:P279*           wd:Q4022.    # rivers
+  ?item          wdt:P17                     wd:Q30.      # country USA
+  ?item          p:P2043                     ?stmnode.    # length
+  ?stmnode       psv:P2043                   ?valuenode.
+  ?valuenode     wikibase:quantityAmount     ?length.
+  ?valuenode     wikibase:quantityUnit       ?unit.
+  ?valuenode     wikibase:quantityLowerBound ?lowerbound.
+  ?valuenode     wikibase:quantityUpperBound ?upperbound.
+  BIND((?upperbound-?lowerbound)/2 AS ?precision).
+  BIND(IF(?precision=0, ?length, (CONCAT(str(?length), "±", str(?precision)))) AS ?length2). 
+
+  # conversion to SI unit
+  ?unit          p:P2370                 ?unitstmnode.   # conversion to SI unit
+  ?unitstmnode   psv:P2370               ?unitvaluenode. 
+  ?unitvaluenode wikibase:quantityAmount ?conversion.
+  ?unitvaluenode wikibase:quantityUnit   wd:Q11573.      # meter
+  BIND(?length * ?conversion AS ?length_in_m).
+  
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+} 
+ORDER BY DESC(?length_in_m)
+LIMIT 10
+```
+
+##### BIND
+BIND 的基本格式： `BIND(expression AS ?variable)`
+可以把 expression 的值指定給 ?variable
+expression 中是可以進行 +,-,*,/ 運算的
+##### IF
+IF 的基本格式： `IF(condition,thenExpression,elseExpression)`
+#### 延伸閱讀
+https://www.wikidata.org/wiki/Wikidata:Units
+https://www.mediawiki.org/w/index.php?title=Wikibase/DataModel#Quantities
+
+## 
+### 巨大範例
+附上一個我實際用到的 Query
 
 [Open in Query](https://query.wikidata.org/#SELECT%20%3Fitem%20%3FitemLabel%20%3FcreatorLabel%20%3Finception%20%3Fheight%20%3Fwidth%20%3FmaterialLabel%20%3Fimage%0AWHERE%20%7B%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22zh-tw%2C%20zh-hant%2C%20zh%2C%20en%22.%20%7D%0A%0A%20%20%3Fitem%20%20wdt%3AP170%20%20wd%3AQ700797%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Fcreator%3B%0A%20%20%20%20%20%20%20%20%20wdt%3AP18%20%20%20%3Fimage.%0A%0A%20%20OPTIONAL%20%7B%0A%20%20%20%20%3Fitem%20%20wdt%3AP186%20%20%3Fmaterial%3B%0A%20%20%20%20%20%20%20%20%20%20%20wdt%3AP571%20%20%3Finception.%0A%20%20%7D%0A%0A%20%20%23%20Height%0A%20%20%3Fitem%20%20%20%20p%3AP2048%2Fpsv%3AP2048%20%20%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20wikibase%3AquantityAmount%20%20%3Fh_value%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20wikibase%3AquantityUnit%20%20%20%20%3Fh_unit%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%5D.%0A%20%20%3Fh_unit%20%20p%3AP2370%2Fpsv%3AP2370%20%20%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20wikibase%3AquantityAmount%20%20%3Fh_conversion%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20wikibase%3AquantityUnit%20%20%20%20wd%3AQ11573%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%5D.%0A%20%20BIND%28%3Fh_value%20%2a%20%3Fh_conversion%20AS%20%3Fheight%29.%0A%0A%20%20%23%20Width%0A%20%20%3Fitem%20%20%20%20p%3AP2049%2Fpsv%3AP2049%20%20%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20wikibase%3AquantityAmount%20%20%3Fw_value%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20wikibase%3AquantityUnit%20%20%20%20%3Fw_unit%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%5D.%0A%20%20%3Fw_unit%20%20p%3AP2370%2Fpsv%3AP2370%20%20%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20wikibase%3AquantityAmount%20%20%3Fw_conversion%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20wikibase%3AquantityUnit%20%20%20%20wd%3AQ11573%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%5D.%0A%20%20BIND%28%3Fw_value%20%2a%20%3Fw_conversion%20AS%20%3Fwidth%29.%0A%7D)
 ```javascript=
@@ -420,41 +478,3 @@ WHERE {
 | | |
 |-|-|
 | line 5 | 之所以要加上 `,?creator` 是因為我希望在指定作者的同時也要顯示作者名字 |
-
-<style>
-.part{
-    margin-left: 26px;
-}
-h1.part{
-    text-align:center;
-}
-h2.part{
-    margin-left: 0px;
-    border: solid;
-    border-left: none;
-    border-right: none;
-    border-top: 3px #900 solid;
-    border-bottom: 1px #396 solid;
-    color: black;
-    text-align:center;
-    background-color: #F6F6F6;
-    padding: 6px;
-}
-h3.part{
-    margin-left: 0px;
-    border-top: solid 1.5px #069;
-    border-bottom: solid 1px #396;
-    padding: 5px 5px;
-}
-h4.part{
-    margin-left: 15px;
-    border: dotted #396;
-    border-width: 1px 0px 0px 0px;
-}
-h5.part{
-    margin-left: 20px;
-}
-h6.part{
-    margin-left: 23px;
-}
-</style>
