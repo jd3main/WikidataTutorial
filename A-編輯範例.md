@@ -3,8 +3,8 @@ Wikidata 入門筆記 A - 編輯範例
 
 ###### tags: `Wikidata`
 
-:::warning
-(2018/11/28) 這是複製出來提供預覽的版本
+:::info
+[(以書本模式瀏覽)](https://hackmd.io/@jd3main/H1TpO43CX/)
 :::
 
 目前 Item 主要有幾種來源
