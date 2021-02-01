@@ -1,3 +1,7 @@
+---
+breaks: true  # False means NOT to render line breaks as hard line breaks.
+---
+
 Wikidata 入門筆記 2 - Query with SPARQL
 =============================
 
