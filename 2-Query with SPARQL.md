@@ -478,3 +478,29 @@ WHERE {
 | | |
 |-|-|
 | line 5 | 之所以要加上 `,?creator` 是因為我希望在指定作者的同時也要顯示作者名字 |
+
+## 排序
+
+以查詢政黨編號為例
+
+* 依照字典序排序
+```javascript=
+SELECT ?item ?id
+WHERE 
+{
+  ?item wdt:P31 wd:Q7278.
+  ?item wdt:P5296 ?id.
+}
+ORDER BY ?id
+```
+
+* 轉成整數排序
+```javascript=
+SELECT ?item ?id
+WHERE 
+{
+  ?item wdt:P31 wd:Q7278.
+  ?item wdt:P5296 ?id.
+}
+ORDER BY xsd:integer(?id)
+```
