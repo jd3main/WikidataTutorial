@@ -5,6 +5,9 @@ Wikidata 入門筆記 2 - Query with SPARQL
 
 {%hackmd pPCm34WnTpyby2g957L4Gg %}
 
+:::info
+[(以書本模式瀏覽)](https://hackmd.io/@jd3main/H1TpO43CX/)
+:::
 
 ## 前言
 
