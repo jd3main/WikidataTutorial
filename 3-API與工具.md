@@ -5,6 +5,10 @@ Wikidata 入門筆記 3 - API與工具
 
 {%hackmd pPCm34WnTpyby2g957L4Gg %}
 
+:::info
+[(以書本模式瀏覽)](https://hackmd.io/@jd3main/H1TpO43CX/)
+:::
+
 ## 關於工具
 [Wikidata:Tools](https://www.wikidata.org/wiki/Wikidata:Tools) 有很多工具可以玩，不過大多年久失修
 
