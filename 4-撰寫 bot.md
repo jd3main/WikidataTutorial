@@ -113,6 +113,34 @@ print(f"success: {success}")
 > 依然需要在 `user-config.py` 當中設定 `usernames` 才能使用
 
 
+### 基本使用
+
+[Wikidata:Creating_a_bot](https://www.wikidata.org/wiki/Wikidata:Creating_a_bot)
+
+上面這個頁面有非常多的範例，包含了大多數的使用需求
+
+但值得一題的是，你**不需要**像裡面的範例一樣寫成
+```python=
+site = pywikibot.Site("test", "wikidata")
+repo = site.data_repository()
+```
+
+因為這裡 site 和 repo 是完全相等的
+請參考下面的使用範例
+
+#### 取得資料
+
+```python=
+from pywikibot import Site, ItemPage
+
+site = Site('wikidata', 'wikidata')
+item = ItemPage(site, 'Q65555605')
+data = item.get()
+print(data)
+```
+
+
+
 ### 疑難排解
 
 #### `badtoken: Invalid CSRF token`
