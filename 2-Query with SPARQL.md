@@ -97,11 +97,43 @@ Wikidata 提供了一大堆前綴
 WHERE{...} 裡的條件每句都要符合才會被取出。
 可以想像成枚舉資料庫裡的所有東西，試著代進變數裡面
 然後一句一句看是否符合，符合就取出，不符合就再試下一組
-(當然內部實作不可能是這樣)
 
-### Label Service
+### Label
 
-`[AUTO_LANGUAGE]` 會被自動轉換成當前 Query 頁面的語言
+以下介紹兩種取得 label 的方式
+
+#### rdfs:label
+
+:::warning
+這個語法很容易寫出超時的 query
+請加一些嚴格的條件 (例如性質：河流) 避免需要篩選的項目太多
+:::
+
+```javascript=
+?item rdfs:label ?label.
+FILTER (LANG(?label) = "en").
+```
+
+如果只有第一行，會列出所有不同語言的 label
+第二行的 filter 是用來篩選特定語言
+
+如果要查詢擁有指定 label 的項目，你必須指定想要的語言
+例如查詢名為"淡水河"的項目：
+```javascript=
+?item rdfs:label "淡水河"@zh.
+```
+@後面加上語言代碼，這個東西叫做 language tag
+如果把 language tag 移除是搜不到任何東西的
+
+
+#### Label Service
+```javascript=
+SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
+```
+
+引號("")內填入一個或多個 language code
+如果找不到第一個語言的 label 就會使用第二個，依此類推
+`[AUTO_LANGUAGE]` 則會被自動轉換成當前 Query 頁面的語言
 其他的則參考 [Mediawiki Language Code](https://phabricator.wikimedia.org/source/mediawiki/browse/master/languages/data/Names.php)
 
 #### 中文的 Label
@@ -109,39 +141,25 @@ WHERE{...} 裡的條件每句都要符合才會被取出。
 Mediawiki 有自己一套 language code
 大致上跟 ISO 的一樣，但是中文的部分就很雜
 
-zh 開頭的就有這些
+以下是我常用的 Language Code
+
 | Language Code | Description |
 |---------------|-------------|
 | zh            | 中文
-| **zh-hant**   | **繁體**
-| zh-hans       | 簡體
-| **zh-tw**     | **中文（台灣）**
-| zh-cn         | 中文（中國）
-| zh-hk         | 中文（香港）
-| zh-mo         | 中文（澳門）
-| zh-my         | 中文（馬來西亞）
-| zh-sg         | 中文（新加坡）
-| zh-classical  | 文言
-| zh-min-nan    | 閩南語
-| zh-yue        | 粵語
-
-通常我會優先使用 zh-hant 和 zh-tw
-
-#### 多個語言
-你可以指定多個語言，並依照給定的優先順序來使用
-例如： `zh-tw, zh-hant, en`
-這表示使用 中文(台灣)
+| zh-hant       | 繁體
+| zh-tw         | 中文（台灣）
+| en            | English
 
 ### Limit
-在 `WHERE{ ... }` 後面 加上 `limit <number>` 就可以限制查詢的數量
+在 `WHERE{ ... }` 後面 加上 `LIMIT <number>` 就可以限制查詢的數量
 
 例如要限制最多 100 條結果：
-```
+```javascript=
 WHERE
 {
     #...
     #...
-} limit 100
+} LIMIT 100
 ```
 
 ### 選擇性的取值
@@ -317,7 +335,7 @@ Q1  P1 [
 `*` 可以表示一個路徑重複 **0** 次或多次
 `+` 可以表示一個路徑重複 **1** 次或多次
 例如
-```javascript=
+```javascript
 ?item wdt:P31/wdt:P279* wd:Q735.
 ```
 可以找到所有 藝術品(Q735) 或其子類別的 instance
